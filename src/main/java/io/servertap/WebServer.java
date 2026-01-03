@@ -97,7 +97,10 @@ public class WebServer {
                             openApiSecurity.withApiKeyAuth("ApiKeyAuth", "key");
                         }));
             }));
-            config.registerPlugin(new SwaggerPlugin());
+            config.registerPlugin(new SwaggerPlugin(swagger -> {
+                swagger.setUiPath("/swagger");
+                swagger.setDocumentationPath("/swagger-docs");
+            }));
         }
     }
 
