@@ -4,7 +4,7 @@
 
     <groupId>io.servertap</groupId>
     <artifactId>ServerTap</artifactId>
-    <version>0.6.2-SNAPSHOT</version>
+    <version>0.6.3-SNAPSHOT</version>
 
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/servertap-io/servertap.git</developerConnection>

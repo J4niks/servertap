@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.3
+* Upgraded project to JDK 21
+* +Small fixes
+
 ## v0.6.1
 
 ### ⚠️ BREAKING CHANGES ⚠️
