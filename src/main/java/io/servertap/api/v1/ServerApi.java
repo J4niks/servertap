@@ -35,7 +35,6 @@ public class ServerApi {
     private final ServerTapMain main;
     private final EconomyWrapper economy;
     private final org.bukkit.Server bukkitServer = Bukkit.getServer();
-    private ScoreboardManager scoreboardManager;
     private final LagDetector lagDetector;
 
     public ServerApi(ServerTapMain main, Logger log, LagDetector lagDetector, EconomyWrapper economy) {
@@ -44,9 +43,6 @@ public class ServerApi {
         this.economy = economy;
         this.lagDetector = lagDetector;
 
-        Bukkit.getScheduler().runTask(main, () -> {
-            scoreboardManager = Bukkit.getScoreboardManager();
-        });
     }
 
     @OpenApi(
@@ -223,17 +219,21 @@ public class ServerApi {
     )
 
     public void scoreboardGet(Context ctx) {
+        ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
+
         if (scoreboardManager == null) {
-            throw new ServiceUnavailableResponse("Scoreboard manager is not initialized");
+            throw new ServiceUnavailableResponse("Scoreboard not available yet");
         }
-        
-        org.bukkit.scoreboard.Scoreboard gameScoreboard = scoreboardManager.getMainScoreboard();
+
+        org.bukkit.scoreboard.Scoreboard gameScoreboard =
+                scoreboardManager.getMainScoreboard();
+
         Scoreboard scoreboardModel = new Scoreboard();
         Set<String> objectives = new HashSet<>();
-
         Set<String> entries = new HashSet<>(gameScoreboard.getEntries());
 
-        gameScoreboard.getObjectives().forEach(objective -> objectives.add(objective.getName()));
+        gameScoreboard.getObjectives()
+                .forEach(objective -> objectives.add(objective.getName()));
 
         scoreboardModel.setEntries(entries);
         scoreboardModel.setObjectives(objectives);
@@ -256,20 +256,28 @@ public class ServerApi {
             }
     )
     public void objectiveGet(Context ctx) {
+        ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
+
         if (scoreboardManager == null) {
-            throw new ServiceUnavailableResponse("Scoreboard manager is not initialized");
+            throw new ServiceUnavailableResponse("Scoreboard not available yet");
         }
-        
+
         String objectiveName = ctx.pathParam("name");
-        org.bukkit.scoreboard.Scoreboard gameScoreboard = scoreboardManager.getMainScoreboard();
-        org.bukkit.scoreboard.Objective objective = gameScoreboard.getObjective(objectiveName);
+
+        org.bukkit.scoreboard.Scoreboard gameScoreboard =
+                scoreboardManager.getMainScoreboard();
+
+        org.bukkit.scoreboard.Objective objective =
+                gameScoreboard.getObjective(objectiveName);
 
         if (objective == null) throw new NotFoundResponse();
 
         ctx.json(fromBukkitObjective(objective));
     }
 
+
     private Objective fromBukkitObjective(org.bukkit.scoreboard.Objective objective) {
+        ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
         org.bukkit.scoreboard.Scoreboard gameScoreboard = scoreboardManager.getMainScoreboard();
 
         Objective o = new Objective();
@@ -488,9 +496,6 @@ public class ServerApi {
             })
     public void opPlayer(Context ctx) {
         String uuid = ctx.formParam("playerUuid");
-        String name = ctx.formParam("name");
-
-        if (name.isEmpty()) throw new BadRequestResponse(Constants.PLAYER_MISSING_PARAMS);
 
         UUID playerUUID = ValidationUtils.safeUUID(uuid);
         if (playerUUID == null) throw new BadRequestResponse(Constants.INVALID_UUID);
