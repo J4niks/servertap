@@ -322,7 +322,7 @@ Use this only if necessary.
 You need a few things to get started
 
 - An IDE (e.g. IntelliJ)
-- JDK 19
+- JDK 21
 - Maven
 
 Then, you can build the plugin `jar` by using the `mvn package` command.
